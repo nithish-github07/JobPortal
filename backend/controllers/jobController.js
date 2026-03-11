@@ -15,10 +15,27 @@ export const createJob = async(req,res) => {
 
 export const getAllJobs = async(req,res) => {
     try{
-        const jobs = await Job.find().populate(
-            "postedBy",
-            "name email"
-        );
+        const keyword = req.query.keyword ? {
+            title: {
+                $regex: req.query.keyword,
+                $options: "i",
+            },
+        }
+        : {};
+
+        const location = req.query.location ? {
+            location: {
+                $regex: req.query.location,
+                $options: "i",
+            },
+        }
+        : {};
+
+        const jobs = await Job.find({
+            ...keyword,
+            ...location,
+        }).populate("postedBy", "name email");
+
         res.json(jobs);
     }catch(error){
         res.status(500).json({message: "Error fetching jobs"});

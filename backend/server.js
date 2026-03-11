@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import User from "./models/User.js";
 import authRoutes from "./routes/authRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
-
+import applicationRoutes from "./routes/applicationRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/auth",authRoutes);
 app.use("/api/jobs",jobRoutes);
+app.use("/api/applications",applicationRoutes);
 
 app.get("/",(req,res) => {
     res.send("Job Portal API running...");
