@@ -1,13 +1,31 @@
 import Application from "../models/Application.js";
+import Job from "../models/Job.js";
 
 export const applyJob = async(req,res) => {
     try{
         const jobId = req.params.jobId;
+        const job = await Job.findById(jobId);
+        if(!job){
+            return res.status(404).json({message: "Job not found"});
+        }
 
+        const alreadyApplied = await Application.findOne({
+            job: jobId,
+            applicant: req.user._id
+        });
+
+        if(alreadyApplied){
+            return res.status(400).json({message: "You already applied"});
+        }
+
+        if(req.user.role != "jobSeeker"){
+            return res.status(403).json({message: "Only jobSeekers can apply"});
+        }
         const application = await Application.create({
             job: jobId,
             applicant: req.user._id,
         });
+
 
         res.status(201).json(application);
     }catch(error){

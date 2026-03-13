@@ -15,26 +15,36 @@ export const createJob = async(req,res) => {
 
 export const getAllJobs = async(req,res) => {
     try{
-        const keyword = req.query.keyword ? {
-            title: {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        const filter = {};
+
+        if(req.query.keyword){
+            filter.title = {
                 $regex: req.query.keyword,
                 $options: "i",
-            },
+            };
         }
-        : {};
-
-        const location = req.query.location ? {
-            location: {
+        if (req.query.location) {
+            filter.location = {
                 $regex: req.query.location,
                 $options: "i",
-            },
+            };
         }
-        : {};
 
-        const jobs = await Job.find({
-            ...keyword,
-            ...location,
-        }).populate("postedBy", "name email");
+        if (req.query.jobType) {
+            filter.jobType = req.query.jobType;
+        }
+
+        if (req.query.experience) {
+            filter.experience = req.query.experience;
+        }
+
+        const jobs = await Job.find(filter)
+            .populate("postedBy", "name email")
+            .skip((page - 1) * limit)
+            .limit(limit);
 
         res.json(jobs);
     }catch(error){
