@@ -24,9 +24,11 @@ const userSchema = new mongoose.Schema(
             default: "jobSeeker",
         },
 
-        resume: {
-            type: String,
-        },
+        bio: String,
+
+        skills: [String],
+
+        resumeURL: String,
     },
     {timestamps: true}
 );

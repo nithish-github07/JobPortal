@@ -8,6 +8,7 @@ import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import savedJobRoutes from "./routes/savedJobRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -22,6 +23,7 @@ app.use("/api/jobs",jobRoutes);
 app.use("/api/applications",applicationRoutes);
 app.use("/api/saved-jobs",savedJobRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/user",userRoutes);
 
 app.get("/",(req,res) => {
     res.send("Job Portal API running...");
