@@ -46,7 +46,11 @@ export const uploadResume = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.resumeUrl = req.body.resumeUrl;
+    if(!req.file){
+      return res.status(400).json({message: "No file uploaded"});
+    }
+
+    user.resumeUrl = req.file.secure_url || req.file.url || req.file.path;
 
     await user.save();
 
