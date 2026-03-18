@@ -1,5 +1,6 @@
 import Application from "../models/Application.js";
 import Job from "../models/Job.js";
+import sendEmail from "../utils/sendEmail.js";
 
 export const applyJob = async(req,res) => {
     try{
@@ -51,7 +52,7 @@ export const getJobApplicants = async(req,res) => {
 
         const applications = await Application.find({
             job: jobId,
-        }).populate("applicant", "name email resumeURL");
+        }).populate("applicant", "name email resumeUrl");
 
         res.json(applications);
     } catch(error){
@@ -67,7 +68,7 @@ export const updateApplicationStatus = async(req,res) => {
             return res.status(400).json({ message: "Invalid status value" });
         }
 
-        const application = await Application.findById(req.params.id).populate("job");
+        const application = await Application.findById(req.params.id).populate("job").populate("applicant");
 
         if(!application){
             return res.status(404).json({message: "Application not found"});
@@ -78,11 +79,43 @@ export const updateApplicationStatus = async(req,res) => {
         }
 
         application.status = status;
-
         await application.save();
+
+        let subject = "";
+        let message = "";
+
+        if (status === "accepted") {
+            subject = "Application Accepted 🎉";
+            message = `
+                <h2>Congratulations 🎉</h2>
+                <p>Your application for <b>${application.job.title}</b> in our company <b>${application.job.company}</b> has been accepted.</p>
+                <p>We will contact you with further details.</p>
+                <br/>
+                <p>Best regards,<br/>Recruitment Team</p>
+            `;
+        } else if (status === "rejected") {
+            subject = "Application Status Update";
+            message = `
+                <h2>Application Update</h2>
+                <p>Thank you for applying for <b>${application.job.title}</b> in our company <b>${application.job.company}</b>.</p>
+                <p>We regret to inform you that your application was not selected at this time.</p>
+                <p>We encourage you to apply for future opportunities.</p>
+                <br/>
+                <p>Best regards,<br/>Recruitment Team</p>
+            `;
+        }
+
+        if(subject && message){
+            await sendEmail(
+                application.applicant.email,
+                subject,
+                message
+            );
+        }
 
         res.json({message: "Application status updated", application});
     }catch(error){
+        console.log("ERROR: ",error);
         res.status(500).json({message: "Error updating status"});
     }
 };
