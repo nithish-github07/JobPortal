@@ -28,7 +28,13 @@ const userSchema = new mongoose.Schema(
 
         skills: [String],
 
-        resumeURL: String,
+        resumeUrl: {
+            type: String,
+        },
+
+        resumePublicId: {
+            type: String,
+        },
     },
     {timestamps: true}
 );
