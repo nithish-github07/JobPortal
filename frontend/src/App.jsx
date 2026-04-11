@@ -52,7 +52,7 @@ export default function App() {
           } />
           <Route path="/saved-jobs" element={
             <ProtectedRoute role="jobseeker"><SavedJobs /></ProtectedRoute>
-          } />
+          } />  
 
           {/* Recruiter Only */}
           <Route path="/jobs/create" element={
