@@ -1,14 +1,37 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; 
 import { FaGoogle } from 'react-icons/fa'; 
+import axios from 'axios';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Logging in with:', { email, password });
+    setError('');
+    try{
+        const response = await axios.post('http://localhost:5000/api/auth/login',{
+            email,
+            password
+        });
+
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user',JSON.stringify(response.data.user));
+
+        navigate('/dashboard');
+
+    } catch(err){
+        if (err.response && err.response.data && err.response.data.message) {
+            setError(err.response.data.message);
+      } else {
+            setError('Login failed. Please check your credentials.');
+      }
+      console.error('Login error:', err);
+    }
   };
 
   const styles = `
@@ -66,6 +89,17 @@ const Login = () => {
         font-size: 1rem;
         color: #667085;
         margin: 0 0 32px;
+    }
+
+    .error-message {
+        color: #D92D20;
+        background-color: #FEECEB;
+        border: 1px solid #FECDCA;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.875rem;
+        margin-bottom: 20px;
     }
 
     .input-group {
@@ -274,6 +308,7 @@ const Login = () => {
               <p>Welcome back! Please enter your details.</p>
             </div>
             <form onSubmit={handleLogin}>
+                {error && <div className = "error-message">{error}</div>}
               <div className="input-group">
                 <label htmlFor="email">Email *</label>
                 <input

@@ -1,20 +1,45 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaGoogle } from 'react-icons/fa';
+import axios from 'axios';
+
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('jobSeeker');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log('Registering with:', { name, email, password, role });
+    setError('');
+    try{
+        const response = await axios.post('http://localhost:5000/api/auth/register',{
+            name,
+            email,
+            password,
+            role,
+        });
+
+        if(response.status === 201){
+            navigate('/login');
+        }
+    } catch(error){
+        if(error.response && error.response.data && error.response.data.message){
+            setError(error.response.data.message);
+        }
+        else{
+            setError('Registration failed. Please try again.');
+        }
+
+        console.error('Registration error: ',err);
+    }
   };
 
   const styles = `
-    /* Using styles from the login page for consistency */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
     .register-page-body {
@@ -68,6 +93,17 @@ const Register = () => {
         font-size: 1rem;
         color: #667085;
         margin: 0 0 32px;
+    }
+
+    .error-message{
+        color: #D92D20;
+        background-color: #FEECEB;
+        border: 1px solid #FECDCA;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.875rem;
+        margin-bottom: 20px;
     }
 
     .input-group {
@@ -245,6 +281,7 @@ const Register = () => {
               <p>Start your journey with us today.</p>
             </div>
             <form onSubmit={handleRegister}>
+                {error && <div className = "error-message">{error}</div>}
               <div className="input-group">
                 <label htmlFor="name">Name *</label>
                 <input

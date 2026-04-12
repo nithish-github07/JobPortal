@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/common/ProtectedRoute";
-import Navbar from "./components/layout/Navbar";
+import Sidebar from "./components/layout/Navbar";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -24,11 +24,20 @@ import SavedJobs from "./pages/savedJob/SavedJobs";
 // Dashboard
 import Dashboard from "./pages/dashboard/Dashboard";
 
+const AppLayout = () => (
+  <div style={{ display: 'flex' }}>
+    <Sidebar /> 
+    <main style={{ flexGrow: 1, padding: '2rem', backgroundColor: '#F9FAFB' }}>
+      <Outlet /> 
+    </main>
+  </div>
+);
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Navbar />
+        <Sidebar />
         <Routes>
 
           {/* Public Routes */}
