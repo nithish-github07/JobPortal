@@ -37,47 +37,51 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Sidebar />
-        <Routes>
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <Sidebar />
+          <main style={{ flex: 1, width: '100%' }}>
+            <Routes>
 
-          {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/jobs" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/jobs" element={<JobList />} />
-          <Route path="/jobs/:id" element={<JobDetail />} />
+              {/* Public Routes */}
+              <Route path="/" element={<Navigate to="/jobs" />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/jobs" element={<JobList />} />
+              <Route path="/jobs/:id" element={<JobDetail />} />
 
-          {/* Any Logged In User */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute><Dashboard /></ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute><Profile /></ProtectedRoute>
-          } />
+              {/* Any Logged In User */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute><Dashboard /></ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute><Profile /></ProtectedRoute>
+              } />
 
-          {/* Jobseeker Only */}
-          <Route path="/my-applications" element={
-            <ProtectedRoute role="jobseeker"><MyApplications /></ProtectedRoute>
-          } />
-          <Route path="/saved-jobs" element={
-            <ProtectedRoute role="jobseeker"><SavedJobs /></ProtectedRoute>
-          } />  
+              {/* Jobseeker Only */}
+              <Route path="/my-applications" element={
+                <ProtectedRoute role="jobseeker"><MyApplications /></ProtectedRoute>
+              } />
+              <Route path="/saved-jobs" element={
+                <ProtectedRoute role="jobseeker"><SavedJobs /></ProtectedRoute>
+              } />  
 
-          {/* Recruiter Only */}
-          <Route path="/jobs/create" element={
-            <ProtectedRoute role="recruiter"><CreateJob /></ProtectedRoute>
-          } />
-          <Route path="/jobs/:id/edit" element={
-            <ProtectedRoute role="recruiter"><EditJob /></ProtectedRoute>
-          } />
-          <Route path="/jobs/:jobId/applicants" element={
-            <ProtectedRoute role="recruiter"><JobApplicants /></ProtectedRoute>
-          } />
+              {/* Recruiter Only */}
+              <Route path="/jobs/create" element={
+                <ProtectedRoute role="recruiter"><CreateJob /></ProtectedRoute>
+              } />
+              <Route path="/jobs/:id/edit" element={
+                <ProtectedRoute role="recruiter"><EditJob /></ProtectedRoute>
+              } />
+              <Route path="/jobs/:jobId/applicants" element={
+                <ProtectedRoute role="recruiter"><JobApplicants /></ProtectedRoute>
+              } />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" />} />
 
-        </Routes>
+            </Routes>
+          </main>
+        </div>
       </BrowserRouter>
     </AuthProvider>
   );

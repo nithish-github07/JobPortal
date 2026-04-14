@@ -8,7 +8,14 @@ const router = express.Router();
 router.post("/register",registerUser);
 router.post("/login", loginUser);
 router.get("/me",protect,(req,res)=> {
-    res.json(req.user);
+    res.json({
+        user: {
+            id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+            role: req.user.role,
+        }
+    });
 });
 
 export default router;

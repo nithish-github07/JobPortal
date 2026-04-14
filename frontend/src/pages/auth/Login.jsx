@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { FaGoogle } from 'react-icons/fa'; 
-import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 
 const Login = () => {
@@ -9,19 +9,13 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try{
-        const response = await axios.post('http://localhost:5000/api/auth/login',{
-            email,
-            password
-        });
-
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user',JSON.stringify(response.data.user));
-
+        await login({ email, password });
         navigate('/dashboard');
 
     } catch(err){

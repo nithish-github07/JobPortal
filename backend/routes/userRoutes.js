@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/profile",authMiddleware,getProfile);
 router.put("/profile",authMiddleware,updateProfile);
-router.post("/resume",authMiddleware,upload.single("resume"),uploadResume);
+router.post("/resume",upload.single("resume"),authMiddleware,uploadResume);
 router.delete("/account",authMiddleware,deleteAccount);
 
 export default router;

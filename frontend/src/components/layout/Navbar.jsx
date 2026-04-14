@@ -40,7 +40,7 @@ const Sidebar = () => {
             title: "Manage",
             role: "recruiter",
             items: [
-                { path: "/jobs/create", icon: <FiPlusSquare />, name: "Post Job", roles: ["recruiter"] },
+                { path: "/jobs/create", icon: <FiPlusSquare />, name: "Posted Jobs", roles: ["recruiter"] },
             ]
         },
     ];
@@ -72,6 +72,19 @@ const Sidebar = () => {
         .user-info {
             display: flex;
             flex-direction: column;
+        }
+
+        .user-profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            margin-left: -6px;
+            margin-bottom: 15px;
+            margin-top: -15px;
+            object-fit: cover;
+            background-color: #f3f4f6;
+            border: 3px solid #000000ff;
         }
 
         .user-name {
@@ -154,6 +167,7 @@ const Sidebar = () => {
             <aside className="sidebar">
                 <div className="sidebar-user">
                     <div className="user-info">
+                         <img src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=2563eb&color=fff&size=128`} alt="Avatar" className="user-profile-avatar" />
                         <span className="user-name">{user.name}</span>
                         <span className="user-role">{user.role}</span>
                     </div>
