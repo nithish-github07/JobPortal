@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaGoogle } from 'react-icons/fa';
-import axios from 'axios';
+import { authAPI} from '../../api/services';
 
 
 const Register = () => {
@@ -17,7 +17,7 @@ const Register = () => {
     e.preventDefault();
     setError('');
     try{
-        const response = await axios.post('http://localhost:5000/api/auth/register',{
+        const response = await authAPI.register({
             name,
             email,
             password,

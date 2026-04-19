@@ -40,7 +40,7 @@ const Sidebar = () => {
             title: "Manage",
             role: "recruiter",
             items: [
-                { path: "/jobs/create", icon: <FiPlusSquare />, name: "Posted Jobs", roles: ["recruiter"] },
+                { path: "/jobs/create", icon: <FiPlusSquare />, name: "Post Job", roles: ["recruiter"] },
             ]
         },
     ];

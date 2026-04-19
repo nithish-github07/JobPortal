@@ -2,29 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FiMail, FiFileText } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { userAPI} from '../../api/services';
 
 const getAuthToken = () => {
     return localStorage.getItem('token');
 };
-
-const API_BASE_URL = 'http://localhost:5000/api/user';
-
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-api.interceptors.request.use((config) => {
-    const token = getAuthToken();
-    if (token && token !== 'your_jwt_token_here') {
-        config.headers['Authorization'] = `Bearer ${token}`;
-    } else if (token === 'your_jwt_token_here') {
-        console.warn("Using a placeholder JWT token. Please replace `getAuthToken` with your actual token retrieval logic.");
-    }
-    return config;
-});
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -37,7 +19,7 @@ const Profile = () => {
 
     const fetchProfile = async () => {
         try {
-            const { data } = await api.get('/profile');
+            const { data } = await userAPI.getProfile();
             setUser(data);
             setFormData({
                 name: data.name,
@@ -75,7 +57,7 @@ const Profile = () => {
         e.preventDefault();
         const skillsArray = formData.skills.split(',').map(skill => skill.trim()).filter(skill => skill);
         try {
-            const { data } = await api.put('/profile', { ...formData, skills: skillsArray });
+            const { data } = await userAPI.updateProfile({ ...formData, skills: skillsArray });
             setUser(data);
             setIsEditing(false);
             setMessage({ type: 'success', content: 'Profile updated successfully!' });
@@ -98,12 +80,7 @@ const Profile = () => {
         resumeFormData.append('resume', resumeFile);
 
         try {
-            const { data } = await axios.post(`${API_BASE_URL}/resume`, resumeFormData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${getAuthToken()}`
-                }
-            });
+            const { data } = await userAPI.uploadResume(resumeFormData);
             fetchProfile(); 
             setResumeFile(null);
             if(fileInputRef.current) fileInputRef.current.value = "";
@@ -117,7 +94,7 @@ const Profile = () => {
     const handleDeleteAccount = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action is irreversible.')) {
             try {
-                await api.delete('/account');
+                await userAPI.deleteAccount();
                 setMessage({ type: 'success', content: 'Account deleted successfully.' });
                 setUser(null); 
                 navigate('/login');
@@ -439,7 +416,7 @@ const Profile = () => {
             <div className="profile-container">
                 <div className="profile-card">
                     <div className="profile-cover"></div>
-                    
+                        
                     <div className="profile-header-content">
                         <div className="profile-user-info">
                             <img src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=2563eb&color=fff&size=128`} alt="Avatar" className="profile-avatar" />

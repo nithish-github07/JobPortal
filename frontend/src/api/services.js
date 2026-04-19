@@ -20,11 +20,11 @@ export const userAPI = {
 
 // ─── Jobs ──────────────────────────────────────────────
 export const jobAPI = {
-  create: (data) => api.post("/job", data),
-  getAll: (params) => api.get("/job", { params }),
-  getById: (id) => api.get(`/job/${id}`),
-  update: (id, data) => api.put(`/job/${id}`, data),
-  delete: (id) => api.delete(`/job/${id}`),
+  create: (data) => api.post("/jobs", data),
+  getAll: (params) => api.get("/jobs", { params }),
+  getById: (id) => api.get(`/jobs/${id}`),
+  update: (id, data) => api.put(`/jobs/${id}`, data),
+  delete: (id) => api.delete(`/jobs/${id}`),
 };
 
 // ─── Applications ─────────────────────────────────────
