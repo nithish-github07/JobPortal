@@ -76,12 +76,10 @@ export default function CreateJob() {
     }
 
     .page-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #15284A;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #111827;
         margin: 0 0 32px 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
     .header-image-box {
@@ -257,7 +255,7 @@ export default function CreateJob() {
       <style>{styles}</style>
       <div className="create-job-container">
         <div className="form-wrapper">
-          <h1 className="page-title">JOB DETAILS</h1>
+          <h1 className="page-title">Post a New Job</h1>
 
           <form onSubmit={handleSubmit}>
             {error && <div className="error-message">{error}</div>}

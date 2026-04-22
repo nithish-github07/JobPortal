@@ -158,6 +158,7 @@ const Sidebar = () => {
             border: none;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
+            color: #FF0000;
         }
     `;
 

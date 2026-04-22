@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FiMail, FiFileText } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { userAPI} from '../../api/services';
+import { userAPI } from '../../api/services';
+import Loader from '../../components/common/Loader';
 
 const getAuthToken = () => {
     return localStorage.getItem('token');
@@ -81,9 +82,9 @@ const Profile = () => {
 
         try {
             const { data } = await userAPI.uploadResume(resumeFormData);
-            fetchProfile(); 
+            fetchProfile();
             setResumeFile(null);
-            if(fileInputRef.current) fileInputRef.current.value = "";
+            if (fileInputRef.current) fileInputRef.current.value = "";
             setMessage({ type: 'success', content: data.message });
         } catch (error) {
             console.error('Error uploading resume:', error);
@@ -96,7 +97,7 @@ const Profile = () => {
             try {
                 await userAPI.deleteAccount();
                 setMessage({ type: 'success', content: 'Account deleted successfully.' });
-                setUser(null); 
+                setUser(null);
                 navigate('/login');
             } catch (error) {
                 console.error('Error deleting account:', error);
@@ -106,13 +107,19 @@ const Profile = () => {
     };
 
     if (!user) {
-        return <div className="profile-container"><p>{message.content || 'Loading profile...'}</p></div>;
+        return <Loader fullPage message="Loading Profile..." />;
     }
 
     return (
         <>
             <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            .page-title {
+                font-size: 1.875rem;
+                font-weight: 700;
+                color: #111827;
+                margin-bottom: 32px;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
 
             .profile-container {
                 font-family: 'Inter', sans-serif;
@@ -413,10 +420,13 @@ const Profile = () => {
             }
             `}</style>
 
-            <div className="profile-container">
+            <div className="profile-container" style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: '100%', maxWidth: '900px' }}>
+                    <h1 className="page-title">Profile</h1>
+                </div>
                 <div className="profile-card">
                     <div className="profile-cover"></div>
-                        
+
                     <div className="profile-header-content">
                         <div className="profile-user-info">
                             <img src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=2563eb&color=fff&size=128`} alt="Avatar" className="profile-avatar" />
@@ -440,24 +450,24 @@ const Profile = () => {
                         <div className="form-grid">
                             <div className="form-group">
                                 <label>Full Name</label>
-                                <input 
-                                    type="text" 
-                                    name="name" 
-                                    value={formData.name} 
-                                    onChange={handleInputChange} 
-                                    disabled={!isEditing} 
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    disabled={!isEditing}
                                     placeholder="Your Full Name"
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Skills</label>
-                                <input 
-                                    type="text" 
-                                    name="skills" 
-                                    value={formData.skills} 
-                                    onChange={handleInputChange} 
-                                    disabled={!isEditing} 
+                                <input
+                                    type="text"
+                                    name="skills"
+                                    value={formData.skills}
+                                    onChange={handleInputChange}
+                                    disabled={!isEditing}
                                     placeholder="e.g., React, Node.js"
                                 />
                                 {!isEditing && user.skills && user.skills.length > 0 && (
@@ -467,16 +477,16 @@ const Profile = () => {
 
                             <div className="form-group full-width">
                                 <label>Bio</label>
-                                <textarea 
-                                    name="bio" 
-                                    value={formData.bio} 
-                                    onChange={handleInputChange} 
-                                    disabled={!isEditing} 
+                                <textarea
+                                    name="bio"
+                                    value={formData.bio}
+                                    onChange={handleInputChange}
+                                    disabled={!isEditing}
                                     placeholder="Tell us about yourself..."
                                 />
                             </div>
                         </div>
-                        
+
                         {isEditing && (
                             <button type="submit" className="btn-save">Save Changes</button>
                         )}
@@ -501,18 +511,18 @@ const Profile = () => {
                                 )}
                             </div>
                         </div>
-                        
+
                         <div className="file-upload-row">
-                            <input 
-                                type="file" 
-                                onChange={handleFileChange} 
-                                ref={fileInputRef} 
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
                                 accept=".pdf,.doc,.docx"
                                 className="file-upload-input"
                             />
-                            <button 
-                                onClick={handleResumeUpload} 
-                                className="btn-light" 
+                            <button
+                                onClick={handleResumeUpload}
+                                className="btn-light"
                                 disabled={!resumeFile}
                                 type="button"
                             >

@@ -29,19 +29,19 @@ export const jobAPI = {
 
 // ─── Applications ─────────────────────────────────────
 export const applicationAPI = {
-  apply: (jobId, data) => api.post(`/application/${jobId}`, data),
-  myApplications: () => api.get("/application/my"),
-  jobApplicants: (jobId) => api.get(`/application/job/${jobId}`),
+  apply: (jobId, data) => api.post(`/applications/${jobId}`, data),
+  myApplications: () => api.get("/applications/my"),
+  jobApplicants: (jobId) => api.get(`/applications/job/${jobId}`),
   updateStatus: (id, status) =>
-    api.patch(`/application/${id}/status`, { status }),
-  withdraw: (id) => api.delete(`/application/${id}`),
+    api.patch(`/applications/${id}/status`, { status }),
+  withdraw: (id) => api.delete(`/applications/${id}`),
 };
 
 // ─── Saved Jobs ────────────────────────────────────────
 export const savedJobAPI = {
-  save: (jobId) => api.post(`/savedJob/${jobId}`),
-  getSaved: () => api.get("/savedJob"),
-  remove: (jobId) => api.delete(`/savedJob/${jobId}`),
+  save: (jobId) => api.post(`/saved-jobs/${jobId}`),
+  getSaved: () => api.get("/saved-jobs"),
+  remove: (jobId) => api.delete(`/saved-jobs/${jobId}`),
 };
 
 // ─── Dashboard ─────────────────────────────────────────
