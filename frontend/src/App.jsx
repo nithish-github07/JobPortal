@@ -59,10 +59,10 @@ export default function App() {
 
               {/* Jobseeker Only */}
               <Route path="/my-applications" element={
-                <ProtectedRoute role="jobseeker"><MyApplications /></ProtectedRoute>
+                <ProtectedRoute role="jobSeeker"><MyApplications /></ProtectedRoute>
               } />
               <Route path="/saved-jobs" element={
-                <ProtectedRoute role="jobseeker"><SavedJobs /></ProtectedRoute>
+                <ProtectedRoute role="jobSeeker"><SavedJobs /></ProtectedRoute>
               } />  
 
               {/* Recruiter Only */}

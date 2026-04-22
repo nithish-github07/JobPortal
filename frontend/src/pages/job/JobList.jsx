@@ -28,7 +28,7 @@ const JobList = () => {
                 setLoading(true);
                 const [jobsRes, savedRes] = await Promise.all([
                     jobAPI.getAll(),
-                    (user && user.role === 'jobseeker') ? savedJobAPI.getSaved() : Promise.resolve({ data: [] })
+                    (user && user.role?.toLowerCase() === 'jobseeker') ? savedJobAPI.getSaved() : Promise.resolve({ data: [] })
                 ]);
                 
                 setJobs(jobsRes.data);
@@ -152,7 +152,14 @@ const JobList = () => {
                     margin-bottom: 24px;
                 }
 
+                .title-icon{
+                    color: #2563EB;
+                }
+
                 .page-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
                     font-size: 1.875rem;
                     font-weight: 700;
                     color: #111827;
@@ -375,13 +382,16 @@ const JobList = () => {
                     min-height: 400px;
                     width: 100%;
                     grid-column: 1 / -1;
-                    color: #6B7280;
+                    font-size: 1.5rem;
+                    color: #111827;
+                    margin-bottom: 8px;
                 }
             `}</style>
 
             <header className="page-header">
                 <div className="header-top">
                     <h1 className="page-title">
+                        <FiBriefcase className="title-icon" />
                         {user?.role?.toLowerCase() === 'recruiter' ? 'Manage Jobs' : 'Discover Opportunities'}
                     </h1>
                     <div className="search-bar">
@@ -496,8 +506,8 @@ const JobList = () => {
                     ))
                 ) : (
                     <div className="empty-state">
-                        <FiSearch size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-                        <p>{searchTerm ? 'No jobs found matching your search.' : 'No jobs available at the moment.'}</p>
+                        <FiSearch size={64} style={{ marginBottom: '20px', opacity: 0.2, color: '#2563EB' }} />
+                        <h3>{searchTerm ? 'No matches found' : 'No jobs available at the moment'}</h3>
                     </div>
                 )}
             </main>

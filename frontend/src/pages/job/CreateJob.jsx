@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
-import { FiImage, FiUser, FiChevronDown, FiCalendar } from 'react-icons/fi';
+import { FiImage, FiUser, FiChevronDown, FiCalendar, FiPlusSquare } from 'react-icons/fi';
 import {jobAPI} from '../../api/services';
 
 export default function CreateJob() {
@@ -75,7 +75,14 @@ export default function CreateJob() {
         width: 100%;
     }
 
+    .title-icon{
+      color: #2563EB
+    }
+      
     .page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         font-size: 1.875rem;
         font-weight: 700;
         color: #111827;
@@ -255,7 +262,10 @@ export default function CreateJob() {
       <style>{styles}</style>
       <div className="create-job-container">
         <div className="form-wrapper">
-          <h1 className="page-title">Post a New Job</h1>
+          <h1 className="page-title">
+            <FiPlusSquare className="title-icon" />
+            Post a New Job
+          </h1>
 
           <form onSubmit={handleSubmit}>
             {error && <div className="error-message">{error}</div>}
