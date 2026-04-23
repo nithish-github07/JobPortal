@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { FiMail, FiFileText } from 'react-icons/fi';
+import { FiMail, FiFileText, FiUser } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../../api/services';
 import Loader from '../../components/common/Loader';
@@ -114,11 +114,17 @@ const Profile = () => {
         <>
             <style>{`
             .page-title {
+                display: flex;
+                align-items: center;
+                gap: 12px;
                 font-size: 1.875rem;
                 font-weight: 700;
                 color: #111827;
-                margin-bottom: 32px;
-                font-family: 'Plus Jakarta Sans', sans-serif;
+                margin: 0 0 32px 0;
+            }
+
+            .title-icon{
+                color: #2563EB;
             }
 
             .profile-container {
@@ -422,7 +428,10 @@ const Profile = () => {
 
             <div className="profile-container" style={{ flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ width: '100%', maxWidth: '900px' }}>
-                    <h1 className="page-title">Profile</h1>
+                    <h1 className="page-title">
+                        <FiUser className = "title-icon"/>
+                        Profile
+                    </h1>
                 </div>
                 <div className="profile-card">
                     <div className="profile-cover"></div>

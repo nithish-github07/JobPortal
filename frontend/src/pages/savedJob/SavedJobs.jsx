@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
     FiX, 
     FiMapPin, 
@@ -14,6 +14,7 @@ import Loader from '../../components/common/Loader';
 
 const SavedJobs = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const [savedJobs, setSavedJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -50,8 +51,15 @@ const SavedJobs = () => {
         }
     };
 
-    const handleCardClick = (jobId) => {
-        navigate(`/jobs/${jobId}`);
+    const handleCardClick = (job) => {
+        const allJobs = savedJobs.map(item => item.job);
+        navigate(`/jobs/${job._id}`, { 
+            state: { 
+                background: location,
+                jobData: job,
+                allJobs: allJobs 
+            } 
+        });
     };
 
     const formatDate = (dateString) => {
@@ -329,7 +337,7 @@ const SavedJobs = () => {
                             <div 
                                 key={item._id} 
                                 className="job-card"
-                                onClick={() => handleCardClick(job._id)}
+                                onClick={() => handleCardClick(job)}
                             >
                                 <div className="card-header">
                                     <div className="title-area">

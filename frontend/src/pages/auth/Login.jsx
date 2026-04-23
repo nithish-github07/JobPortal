@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { FaGoogle } from 'react-icons/fa'; 
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/applyo-logo.png';
 
 
 const Login = () => {
@@ -63,7 +64,14 @@ const Login = () => {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 48px;
+        margin-bottom: 10px;
+        margin-left: -10px;
+    }
+
+    .login-logo-img {
+        height: 65px;
+        width: auto;
+        object-fit: contain;
     }
 
     .login-logo-text {
@@ -295,7 +303,7 @@ const Login = () => {
         <div className="login-form-section">
           <div className="login-form-wrapper">
             <div className="login-logo">
-              <span className="login-logo-text">Applyo</span>
+              <img src={logo} alt="Applyo Logo" className="login-logo-img" />
             </div>
             <div className="login-header">
               <h2>Log in</h2>

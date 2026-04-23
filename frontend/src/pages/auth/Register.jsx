@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaGoogle } from 'react-icons/fa';
 import { authAPI} from '../../api/services';
+import logo from '../../assets/applyo-logo.png';
 
 
 const Register = () => {
@@ -73,7 +74,14 @@ const Register = () => {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 24px;
+        margin-bottom: 10px;
+        margin-left: -10px;
+    }
+
+    .register-logo-img {
+        height: 65px;
+        width: auto;
+        object-fit: contain;
     }
 
     .register-logo-text {
@@ -274,7 +282,7 @@ const Register = () => {
         <div className="register-form-section">
           <div className="register-form-wrapper">
             <div className="register-logo">
-              <span className="register-logo-text">Applyo</span>
+              <img src={logo} alt="Applyo Logo" className="register-logo-img" />
             </div>
             <div className="register-header">
               <h2>Create an account</h2>
