@@ -30,7 +30,7 @@ const Login = () => {
   };
 
   const styles = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
     .login-page-body {
         margin: 0;

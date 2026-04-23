@@ -203,7 +203,6 @@ const JobList = () => {
                     font-size: 1.1rem;
                 }
 
-                /* Tabs for Recruiter */
                 .tabs {
                     display: flex;
                     gap: 32px;
@@ -239,14 +238,12 @@ const JobList = () => {
                     background-color: #2563EB;
                 }
 
-                /* Job Grid */
                 .jobs-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
                     gap: 24px;
                 }
 
-                /* Job Card Styling - Premium Look */
                 .job-card {
                     background: #FFFFFF;
                     border: 1px solid #F3F4F6;

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { 
     FiGrid, FiBriefcase, FiFileText, FiBookmark, FiLogOut, FiUser, FiPlusSquare 
 } from 'react-icons/fi';
+import logo from '../../assets/applyo-logo.png';
 
 const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -37,64 +38,94 @@ const Sidebar = () => {
             ]
         },
         {
-            title: "Manage",
+            title: "Management",
             role: "recruiter",
             items: [
                 { path: "/jobs/create", icon: <FiPlusSquare />, name: "Post Job", roles: ["recruiter"] },
             ]
         },
+        {
+            title: "Account",
+            items: [
+                { path: "/profile", icon: <FiUser />, name: "Profile", roles: ["jobSeeker", "recruiter"] },
+                { 
+                    type: "button", 
+                    onClick: handleLogout, 
+                    icon: <FiLogOut />, 
+                    name: "Logout", 
+                    roles: ["jobSeeker", "recruiter"],
+                    className: "logout-btn-nav"
+                },
+            ]
+        }
     ];
 
     const styles = `
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
         .sidebar {
-            width: 260px;
+            width: 280px;
             min-height: 100vh;
             background-color: #FFFFFF;
             border-right: 1px solid #EAECF0;
             display: flex;
             flex-direction: column;
-            padding: 24px 16px;
+            padding: 32px 20px;
             font-family: 'Inter', sans-serif;
             color: #344054;
             box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            margin-bottom: 40px;
+            padding: 0 8px;
+        }
+
+        .sidebar-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
         }
 
         .sidebar-user {
             display: flex;
             align-items: center;
-            padding: 8px;
-            margin-bottom: 24px;
-            border-radius: 8px;
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            gap: 12px;
+        }
+
+        .user-profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .user-info {
             display: flex;
             flex-direction: column;
-        }
-
-        .user-profile-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 4px solid #ffffff;
-            margin-left: -6px;
-            margin-bottom: 15px;
-            margin-top: -15px;
-            object-fit: cover;
-            background-color: #f3f4f6;
-            border: 3px solid #000000ff;
+            overflow: hidden;
         }
 
         .user-name {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #101828;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .user-role {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: #667085;
             text-transform: capitalize;
         }
@@ -104,61 +135,78 @@ const Sidebar = () => {
         }
 
         .nav-section {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .nav-title {
             font-size: 0.75rem;
-            font-weight: 600;
-            color: #667085;
+            font-weight: 700;
+            color: #98A2B3;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             padding: 0 12px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 12px;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border-radius: 10px;
             text-decoration: none;
-            font-size: 1rem;
+            font-size: 0.9375rem;
             font-weight: 500;
-            color: #344054;
-            transition: background-color 0.2s;
+            color: #475467;
+            transition: all 0.2s;
             margin-bottom: 4px;
+            border: 1px solid transparent;
         }
 
         .nav-link:hover {
             background-color: #F9FAFB;
+            color: #101828;
         }
 
         .nav-link.active {
-            background-color: #F0F6FE;
-            color: #1570EF;
+            background-color: #EFF6FF;
+            color: #2563EB;
             font-weight: 600;
+            border-color: #DBEAFE;
         }
 
         .nav-link svg {
             width: 20px;
             height: 20px;
+            color: #667085;
+            transition: color 0.2s;
         }
 
-        .sidebar-footer {
-            margin-top: auto;
-            border-top: 1px solid #EAECF0;
-            padding-top: 16px;
+        .nav-link.active svg {
+            color: #2563EB;
         }
 
-        .logout-btn {
+        .logout-btn-nav {
             width: 100%;
             background: none;
-            border: none;
+            border: 1px solid transparent;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            color: #FF0000;
+            font-family: inherit;
+            text-align: left;
+        }
+
+        .logout-btn-nav:hover {
+            background-color: #FFF1F0 !important;
+            color: #D92D20 !important;
+        }
+
+        .logout-btn-nav:hover svg {
+            color: #D92D20 !important;
+        }
+
+        /* Hide scrollbar */
+        .sidebar-nav::-webkit-scrollbar {
+            display: none;
         }
     `;
 
@@ -166,44 +214,54 @@ const Sidebar = () => {
         <>
             <style>{styles}</style>
             <aside className="sidebar">
+                <div className="sidebar-header">
+                    <img src={logo} alt="Applyo Logo" className="sidebar-logo" />
+                </div>
+
                 <div className="sidebar-user">
+                    <img 
+                        src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=2563eb&color=fff&size=128`} 
+                        alt="Avatar" 
+                        className="user-profile-avatar" 
+                    />
                     <div className="user-info">
-                         <img src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=2563eb&color=fff&size=128`} alt="Avatar" className="user-profile-avatar" />
                         <span className="user-name">{user.name}</span>
                         <span className="user-role">{user.role}</span>
                     </div>
                 </div>
+
                 <nav className="sidebar-nav">
                     {menuItems.map((section, index) => (
                         (section.role === user.role || !section.role) && (
                             <div className="nav-section" key={index}>
                                 <h3 className="nav-title">{section.title}</h3>
-                                {section.items.map(item => (
+                                {section.items.map((item, idx) => (
                                     item.roles.includes(user.role) && (
-                                        <Link 
-                                            to={item.path} 
-                                            className={`nav-link ${location.pathname === item.path ? 'active' : ''}`} 
-                                            key={item.path}
-                                        >
-                                            {item.icon}
-                                            <span>{item.name}</span>
-                                        </Link>
+                                        item.type === "button" ? (
+                                            <button 
+                                                key={idx}
+                                                onClick={item.onClick} 
+                                                className={`nav-link ${item.className || ''}`}
+                                            >
+                                                {item.icon}
+                                                <span>{item.name}</span>
+                                            </button>
+                                        ) : (
+                                            <Link 
+                                                to={item.path} 
+                                                className={`nav-link ${location.pathname === item.path ? 'active' : ''}`} 
+                                                key={item.path}
+                                            >
+                                                {item.icon}
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        )
                                     )
                                 ))}
                             </div>
                         )
                     ))}
                 </nav>
-                <div className="sidebar-footer">
-                    <Link to="/profile" className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}>
-                        <FiUser />
-                        <span>Profile</span>
-                    </Link>
-                    <button onClick={handleLogout} className="nav-link logout-btn">
-                        <FiLogOut />
-                        <span>Logout</span>
-                    </button>
-                </div>
             </aside>
         </>
     );
