@@ -33,7 +33,7 @@ const Sidebar = () => {
             title: "Manage",
             role: "jobSeeker",
             items: [
-                { path: "/my-applications", icon: <FiFileText />, name: "My Applications", roles: ["jobSeeker"] },
+                { path: "/my-applications", icon: <FiFileText />, name: "Job Applications", roles: ["jobSeeker"] },
                 { path: "/saved-jobs", icon: <FiBookmark />, name: "Saved Jobs", roles: ["jobSeeker"] },
             ]
         },

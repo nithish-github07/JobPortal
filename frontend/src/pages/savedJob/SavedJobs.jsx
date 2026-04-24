@@ -90,7 +90,7 @@ const SavedJobs = () => {
         <div className="job-list-container">
             <style>{`
                 .job-list-container {
-                    padding: 24px 40px;
+                    padding: 40px;
                     max-width: 1400px;
                     margin: 0 auto;
                     font-family: 'Inter', sans-serif;
@@ -111,9 +111,16 @@ const SavedJobs = () => {
                     display: flex;
                     align-items: center;
                     gap: 12px;
-                    font-size: 1.875rem;
-                    font-weight: 700;
+                    font-size: 2rem;
+                    font-weight: 800;
                     color: #111827;
+                    margin-bottom: 8px;
+                }
+
+                .page-subtitle{
+                    margin-top: -19px;
+                    color: #6B7280;
+                    font-size: 1rem;
                 }
 
                 .title-icon {
@@ -269,12 +276,6 @@ const SavedJobs = () => {
                     border-top: 1px solid #F3F4F6;
                 }
 
-                .posted-time {
-                    font-size: 0.875rem;
-                    color: #9CA3AF;
-                    font-weight: 500;
-                }
-
                 .empty-state {
                     display: flex;
                     flex-direction: column;
@@ -326,6 +327,7 @@ const SavedJobs = () => {
                         />
                     </div>
                 </div>
+                <p className="page-subtitle">Your handpicked opportunities, all in one place.</p>
             </header>
 
             <main className="jobs-grid">
@@ -381,11 +383,8 @@ const SavedJobs = () => {
                                 </div>
 
                                 <div className="card-footer">
-                                    <div className="posted-time">
-                                        Saved on {formatDate(item.createdAt)}
-                                    </div>
+
                                     <div className="meta-item" style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
-                                        <FiClock />
                                         <span>Posted {formatDate(job.createdAt)}</span>
                                     </div>
                                 </div>

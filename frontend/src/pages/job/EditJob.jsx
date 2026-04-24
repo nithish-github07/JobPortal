@@ -279,7 +279,7 @@ const EditJob = React.memo(() => {
 
     const handleClose = () => {
         if (location.state?.background) {
-            navigate(-1);
+            navigate(location.state.background);
         } else {
             navigate('/jobs');
         }

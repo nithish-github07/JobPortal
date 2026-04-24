@@ -15,7 +15,7 @@ import Loader from '../../components/common/Loader';
 
 const jobListStyles = `
     .job-list-container {
-        padding: 24px 40px;
+        padding: 40px;
         max-width: 1400px;
         margin: 0 auto;
         font-family: 'Inter', sans-serif;
@@ -40,9 +40,15 @@ const jobListStyles = `
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 1.875rem;
-        font-weight: 700;
+        font-size: 2rem;
+        font-weight: 800;
         color: #111827;
+    }
+
+    .page-subtitle {
+        margin-top: -14px;
+        color: #6B7280;
+        font-size: 1rem;
     }
 
     .search-bar {
@@ -84,6 +90,7 @@ const jobListStyles = `
     }
 
     .tab {
+        margin-top: 15px;
         padding: 12px 4px;
         font-size: 1rem;
         font-weight: 500;
@@ -280,19 +287,24 @@ const JobList = React.memo(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [jobsRes, savedRes] = await Promise.all([
-                    jobAPI.getAll(),
-                    (user && user.role?.toLowerCase() === 'jobseeker') ? savedJobAPI.getSaved() : Promise.resolve({ data: [] })
-                ]);
                 
+                const jobsRes = await jobAPI.getAll();
                 setJobs(jobsRes.data);
-                
-                if (savedRes.data) {
-                    const ids = new Set(savedRes.data.map(item => item.job?._id || item._id));
-                    setSavedJobIds(ids);
+
+    
+                if (user && user.role?.toLowerCase() === 'jobseeker') {
+                    try {
+                        const savedRes = await savedJobAPI.getSaved();
+                        if (savedRes.data) {
+                            const ids = new Set(savedRes.data.map(item => item.job?._id || item._id));
+                            setSavedJobIds(ids);
+                        }
+                    } catch (savedErr) {
+                        console.warn('Could not fetch saved jobs status:', savedErr);
+                    }
                 }
             } catch (err) {
-                console.error('Error fetching jobs:', err);
+                console.error('Critical error fetching jobs:', err);
                 setError('Failed to load jobs. Please try again later.');
             } finally {
                 setLoading(false);
@@ -418,7 +430,10 @@ const JobList = React.memo(() => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+                    
                 </div>
+
+                <p className='page-subtitle'>Explore roles that match your skills and ambitions</p>
 
                 {user?.role?.toLowerCase() === 'recruiter' && (
                     <div className="tabs">
@@ -501,7 +516,7 @@ const JobList = React.memo(() => {
 
                             <div className="card-footer">
                                 <div className="posted-time">
-                                    {formatDate(job.createdAt)}
+                                    Posted {formatDate(job.createdAt)}
                                 </div>
                                 
                                 <div className="action-icons">

@@ -9,7 +9,7 @@ const createJobStyles = `
         min-height: 100vh;
         background-color: #FFFFFF;
         font-family: 'Inter', sans-serif;
-        padding: 40px 20px;
+        padding: 40px;
         display: flex;
         justify-content: center;
     }
@@ -32,6 +32,7 @@ const createJobStyles = `
         color: #111827;
         margin: 0 0 32px 0;
     }
+        
 
     .header-image-box {
         width: 50%;

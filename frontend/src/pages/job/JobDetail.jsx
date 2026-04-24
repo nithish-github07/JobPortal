@@ -138,6 +138,28 @@ const jobDetailStyles = `
         transform: translateY(0);
     }
 
+    .btn-withdraw {
+        background: #FEE2E2;
+        color: #EF4444;
+        padding: 12px 32px;
+        border-radius: 12px;
+        font-weight: 700;
+        border: 1px solid #FECACA;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+    }
+
+    .btn-withdraw:hover {
+        background: #EF4444;
+        color: #FFFFFF;
+        border-color: #EF4444;
+        transform: translateY(-1px);
+    }
+
     .btn-save-detail {
         width: 48px;
         height: 48px;
@@ -332,9 +354,11 @@ const JobDetail = () => {
   const [job, setJob] = useState(null);
   const [otherJobs, setOtherJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
-  const [applied, setApplied] = useState(false);
+  const [appliedApp, setAppliedApp] = useState(null);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   useEffect(() => {
     const stateData = location.state || {};
@@ -353,26 +377,56 @@ const JobDetail = () => {
 
     const fetchJobData = async () => {
       try {
-        const requests = [
-          !jobFromState ? jobAPI.getById(id) : Promise.resolve({ data: jobFromState }),
-          (!stateData.allJobs) ? jobAPI.getAll() : Promise.resolve({ data: [] }),
-          (user && user.role?.toLowerCase() === 'jobseeker') ? savedJobAPI.getSaved() : Promise.resolve({ data: [] })
-        ];
+        setLoading(true);
+        setError(null);
 
-        const [jobRes, allJobsRes, savedRes] = await Promise.all(requests);
 
-        if (!jobFromState) setJob(jobRes.data);
+        let currentJob = jobFromState;
+        if (!currentJob) {
+          try {
+            const jobRes = await jobAPI.getById(id);
+            currentJob = jobRes.data;
+          } catch (jobErr) {
+            console.error('Failed to fetch job details:', jobErr);
+            return; 
+          }
+        }
+        setJob(currentJob);
 
-        if (!stateData.allJobs && allJobsRes.data.length > 0) {
-          setOtherJobs(allJobsRes.data.filter(j => j._id !== id).slice(0, 5));
+        if (user && user.role?.toLowerCase() === 'jobseeker') {
+            savedJobAPI.getSaved()
+              .then(res => {
+                  const savedIds = new Set(res.data.map(item => item.job?._id || item._id));
+                  setIsSaved(savedIds.has(id));
+              })
+              .catch(err => console.warn('Could not fetch saved status:', err));
+
+            applicationAPI.myApplications()
+              .then(res => {
+                  const currentApp = res.data.find(app => (app.job?._id === id || app.job === id));
+                  setAppliedApp(currentApp || null);
+                  
+                  const appliedJobIdsSet = new Set(res.data.map(app => app.job?._id || app.job));
+                  jobAPI.getAll()
+                    .then(allRes => {
+                        setOtherJobs(allRes.data.filter(j => j._id !== id && !appliedJobIdsSet.has(j._id)).slice(0, 5));
+                    })
+                    .catch(err => console.warn('Could not fetch other jobs:', err));
+              })
+              .catch(err => {
+                  console.warn('Could not fetch applications:', err);
+                  jobAPI.getAll()
+                    .then(allRes => setOtherJobs(allRes.data.filter(j => j._id !== id).slice(0, 5)))
+                    .catch(e => console.warn('Could not fetch other jobs fallback:', e));
+              });
+        } else {
+            jobAPI.getAll()
+              .then(res => setOtherJobs(res.data.filter(j => j._id !== id).slice(0, 5)))
+              .catch(err => console.warn('Could not fetch other jobs guest:', err));
         }
 
-        if (savedRes.data) {
-          const savedIds = new Set(savedRes.data.map(item => item.job?._id || item._id));
-          setIsSaved(savedIds.has(id));
-        }
       } catch (err) {
-        console.error(err);
+        console.error('Unexpected error in JobDetail fetch:', err);
       } finally {
         setLoading(false);
       }
@@ -413,8 +467,12 @@ const JobDetail = () => {
 
     try {
       setIsApplying(true);
-      await applicationAPI.apply(id);
-      setApplied(true);
+      const res = await applicationAPI.apply(id);
+      setAppliedApp(res.data);
+      const allJobsRes = await jobAPI.getAll();
+      const appsRes = await applicationAPI.myApplications();
+      const appliedJobIdsSet = new Set(appsRes.data.map(app => app.job?._id || app.job));
+      setOtherJobs(allJobsRes.data.filter(j => j._id !== id && !appliedJobIdsSet.has(j._id)).slice(0, 5));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to apply.');
     } finally {
@@ -422,13 +480,51 @@ const JobDetail = () => {
     }
   };
 
+  const handleWithdraw = async () => {
+    if (!appliedApp) return;
+    if (!window.confirm('Are you sure you want to withdraw your application?')) return;
+
+    try {
+      setIsWithdrawing(true);
+      await applicationAPI.withdraw(appliedApp._id);
+      setAppliedApp(null);
+      const allJobsRes = await jobAPI.getAll();
+      const appsRes = await applicationAPI.myApplications();
+      const appliedJobIdsSet = new Set(appsRes.data.map(app => app.job?._id || app.job));
+      setOtherJobs(allJobsRes.data.filter(j => j._id !== id && !appliedJobIdsSet.has(j._id)).slice(0, 5));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to withdraw application.');
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
   const handleClose = () => {
-    navigate('/jobs');
+    if (location.state?.background) {
+      navigate(location.state.background);
+    } else {
+      navigate('/jobs');
+    }
   };
 
   const renderLoading = () => (
     <div className="modal-loader-container">
       <Loader message="Loading details..." />
+    </div>
+  );
+
+  if (!loading && error) return (
+    <div className="job-detail-overlay" onClick={handleClose}>
+        <style>{jobDetailStyles}</style>
+        <div className="job-detail-modal" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', minHeight: '300px' }} onClick={e => e.stopPropagation()}>
+            <button className="close-btn" onClick={handleClose}>
+                <FiX size={20} />
+            </button>
+            <FiX size={48} style={{ color: '#EF4444', marginBottom: '20px' }} />
+            <h2 style={{ color: '#111827', marginBottom: '8px', fontSize: '1.5rem' }}>Failed to load details</h2>
+            <p style={{ color: '#6B7280', marginBottom: '24px', textAlign: 'center' }}>We couldn't reach the server. Please check your connection and try again.</p>
+            <button className="btn-apply" onClick={() => window.location.reload()}>Retry</button>
+        </div>
     </div>
   );
 
@@ -451,19 +547,23 @@ const JobDetail = () => {
                   <h1 className="job-title-detail">{job.title}</h1>
                   <div className="action-buttons">
                     {user?.role?.toLowerCase() !== 'recruiter' && (
-                      <button
-                        className="btn-apply"
-                        onClick={handleApply}
-                        disabled={isApplying || applied}
-                      >
-                        {applied ? (
-                          <><FiCheckCircle /> Applied</>
-                        ) : isApplying ? (
-                          'Applying...'
-                        ) : (
-                          'Apply Now'
-                        )}
-                      </button>
+                      appliedApp ? (
+                        <button
+                          className="btn-withdraw"
+                          onClick={handleWithdraw}
+                          disabled={isWithdrawing}
+                        >
+                          {isWithdrawing ? 'Withdrawing...' : 'Withdraw Application'}
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-apply"
+                          onClick={handleApply}
+                          disabled={isApplying}
+                        >
+                          {isApplying ? 'Applying...' : 'Apply Now'}
+                        </button>
+                      )
                     )}
                     {user?.role?.toLowerCase() !== 'recruiter' && (
                       <button
@@ -486,7 +586,6 @@ const JobDetail = () => {
 
                 <div className="tags-row">
                   <span className="tag-detail">{job?.jobType?.replace('-', ' ')}</span>
-                  {job?.jobType === 'remote' ? null : <span className="tag-detail">On-site</span>}
                   <span className="tag-detail">{job?.experience ? `${job.experience}+ Years` : 'Fresh Graduate'}</span>
                 </div>
               </div>
