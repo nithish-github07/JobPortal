@@ -4,63 +4,7 @@ import api from '../../api/axios';
 import { FiImage, FiUser, FiChevronDown, FiCalendar, FiPlusSquare } from 'react-icons/fi';
 import {jobAPI} from '../../api/services';
 
-export default function CreateJob() {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const [formData, setFormData] = useState({
-    title: '',
-    company: '', 
-    jobType: '',
-    salary: '',
-    experience: '',
-    location: '',
-    skills: '',
-    description: '',
-  }); 
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    const skillsArray = formData.skills
-      .split(',')
-      .map((skill) => skill.trim())
-      .filter((skill) => skill.length > 0);
-
-    const submissionData = {
-      title: formData.title,
-      company: formData.company || 'Not Specified',
-      jobType: formData.jobType.toLowerCase().replace(' ', '-'),
-      location: formData.location,
-      description: formData.description,
-      salary: Number(formData.salary) ? Number(formData.salary) : undefined,
-      experience: Number(formData.experience) ? Number(formData.experience) : undefined,
-      skills: skillsArray,
-    };
-
-    if (!["full-time", "part-time", "internship", "remote", "hybrid"].includes(submissionData.jobType)) {
-        submissionData.jobType = "full-time";
-    }
-
-    try {
-      await jobAPI.create(submissionData);
-      navigate('/dashboard'); 
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Error saving job details');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const styles = `
+const createJobStyles = `
     .create-job-container {
         min-height: 100vh;
         background-color: #FFFFFF;
@@ -255,144 +199,195 @@ export default function CreateJob() {
             max-width: 100%;
         }
     }
-  `;
+`;
 
-  return (
-    <>
-      <style>{styles}</style>
-      <div className="create-job-container">
-        <div className="form-wrapper">
-          <h1 className="page-title">
-            <FiPlusSquare className="title-icon" />
-            Post a New Job
-          </h1>
+const CreateJob = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-          <form onSubmit={handleSubmit}>
-            {error && <div className="error-message">{error}</div>}
+    const [formData, setFormData] = useState({
+        title: '',
+        company: '', 
+        jobType: '',
+        salary: '',
+        experience: '',
+        location: '',
+        skills: '',
+        description: '',
+    }); 
 
-            <div className="form-grid">
-              {/* Row 1 */}
-              <div className="input-group full-width">
-                <label>Job Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Enter Title"
-                  required
-                />
-              </div>
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-              {/* Row 2 */}
-              <div className="input-group">
-                <label>Company</label>
-                <div className="input-wrapper">
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    placeholder="Company"
-                    className="has-icon"
-                    required
-                  />
-                  <FiChevronDown className="input-icon" />
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        const skillsArray = formData.skills
+            .split(',')
+            .map((skill) => skill.trim())
+            .filter((skill) => skill.length > 0);
+
+        const submissionData = {
+            title: formData.title,
+            company: formData.company || 'Not Specified',
+            jobType: formData.jobType.toLowerCase().replace(' ', '-'),
+            location: formData.location,
+            description: formData.description,
+            salary: Number(formData.salary) ? Number(formData.salary) : undefined,
+            experience: Number(formData.experience) ? Number(formData.experience) : undefined,
+            skills: skillsArray,
+        };
+
+        if (!["full-time", "part-time", "internship", "remote", "hybrid"].includes(submissionData.jobType)) {
+            submissionData.jobType = "full-time";
+        }
+
+        try {
+            await jobAPI.create(submissionData);
+            navigate('/dashboard'); 
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Error saving job details');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <style>{createJobStyles}</style>
+            <div className="create-job-container">
+                <div className="form-wrapper">
+                    <h1 className="page-title">
+                        <FiPlusSquare className="title-icon" />
+                        Post a New Job
+                    </h1>
+
+                    <form onSubmit={handleSubmit}>
+                        {error && <div className="error-message">{error}</div>}
+
+                        <div className="form-grid">
+                            <div className="input-group full-width">
+                                <label>Job Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleChange}
+                                    placeholder="Enter Title"
+                                    required
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Company</label>
+                                <div className="input-wrapper">
+                                    <input
+                                        type="text"
+                                        name="company"
+                                        value={formData.company}
+                                        onChange={handleChange}
+                                        placeholder="Company"
+                                        className="has-icon"
+                                        required
+                                    />
+                                    <FiChevronDown className="input-icon" />
+                                </div>
+                            </div>
+                            
+                            <div className="input-group">
+                                <label>Job Type</label>
+                                <div className="input-wrapper">
+                                    <select name="jobType" value={formData.jobType} onChange={handleChange}>
+                                        <option value="Full Time">Full Time</option>
+                                        <option value="Part Time">Part Time</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Remote">Remote</option>
+                                        <option value="Hybrid">Hybrid</option>
+                                    </select>
+                                    <FiChevronDown className="input-icon" />
+                                </div>
+                            </div>
+
+                            <div className="input-group">
+                                <label>Expected Salary (Per Year)</label>
+                                <input
+                                    type="number"
+                                    name="salary"
+                                    value={formData.salary}
+                                    onChange={handleChange}
+                                    placeholder="Enter Amount in Rs."
+                                    min={0}
+                                    required
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Experience Required (Years)</label>
+                                <input
+                                    type="number"
+                                    name="experience"
+                                    value={formData.experience}
+                                    onChange={handleChange}
+                                    placeholder="Enter Experience"
+                                    min = {0}
+                                    required
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Location</label>
+                                <div className="input-wrapper">
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        placeholder="Enter Location"
+                                        className="has-icon"
+                                        required
+                                    />
+                                    <FiChevronDown className="input-icon" />
+                                </div>
+                            </div>
+
+                            <div className="input-group full-width">
+                                <label>Skill Sets</label>
+                                <input
+                                    type="text"
+                                    name="skills"
+                                    value={formData.skills}
+                                    onChange={handleChange}
+                                    placeholder="Add Skills"
+                                />
+                            </div>
+
+                            <div className="input-group full-width">
+                                <label>Job Description</label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    placeholder="Description"
+                                    required
+                                />
+                            </div>
+
+                            <div className="submit-section full-width">
+                                <button type="submit" disabled={loading} className="btn-submit">
+                                    {loading ? 'Submitting...' : 'Save & Publish Job'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-              </div>
-              
-              <div className="input-group">
-                <label>Job Type</label>
-                <div className="input-wrapper">
-                  <select name="jobType" value={formData.jobType} onChange={handleChange}>
-                    <option value="Full Time">Full Time</option>
-                    <option value="Part Time">Part Time</option>
-                    <option value="Internship">Internship</option>
-                    <option value="Remote">Remote</option>
-                    <option value="Hybrid">Hybrid</option>
-                  </select>
-                  <FiChevronDown className="input-icon" />
-                </div>
-              </div>
-
-              {/* Row 4 */}
-              <div className="input-group">
-                <label>Expected Salary</label>
-                <input
-                  type="number"
-                  name="salary"
-                  value={formData.salary}
-                  onChange={handleChange}
-                  placeholder="Enter Amount in Rs."
-                  min={0}
-                  required
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Experience in Years</label>
-                <input
-                  type="number"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  placeholder="Enter Experience"
-                  min = {0}
-                  required
-                />
-              </div>
-
-              {/* Row 5 */}
-              <div className="input-group">
-                <label>Location</label>
-                <div className="input-wrapper">
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="Enter Location"
-                    className="has-icon"
-                    required
-                  />
-                  <FiChevronDown className="input-icon" />
-                </div>
-              </div>
-
-              {/* Row 6 */}
-              <div className="input-group full-width">
-                <label>Skill Sets</label>
-                <input
-                  type="text"
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleChange}
-                  placeholder="Add Skills"
-                />
-              </div>
-
-              {/* Row 7 */}
-              <div className="input-group full-width">
-                <label>Job Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Description"
-                  required
-                />
-              </div>
-
-              {/* Submit */}
-              <div className="submit-section full-width">
-                <button type="submit" disabled={loading} className="btn-submit">
-                  {loading ? 'Submitting...' : 'Save & Publish Job'}
-                </button>
-              </div>
             </div>
-          </form>
-        </div>
-      </div>
-    </>
-  );
-}
+        </>
+    );
+};
+
+export default CreateJob;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
     FiHeart, 
@@ -13,7 +13,259 @@ import { jobAPI, savedJobAPI } from '../../api/services';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/common/Loader';
 
-const JobList = () => {
+const jobListStyles = `
+    .job-list-container {
+        padding: 24px 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .page-header {
+        margin-bottom: 32px;
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .title-icon{
+        color: #2563EB;
+    }
+
+    .page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .search-bar {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .search-bar input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background-color: #FFFFFF;
+    }
+
+    .search-bar input:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9CA3AF;
+        font-size: 1.1rem;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 32px;
+        border-bottom: 1px solid #E5E7EB;
+        margin-bottom: 32px;
+    }
+
+    .tab {
+        padding: 12px 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #6B7280;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s;
+    }
+
+    .tab:hover {
+        color: #111827;
+    }
+
+    .tab.active {
+        color: #2563EB;
+    }
+
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #2563EB;
+    }
+
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 24px;
+    }
+
+    .job-card {
+        background: #FFFFFF;
+        border: 1px solid #F3F4F6;
+        border-radius: 16px;
+        padding: 24px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .title-area {
+        flex: 1;
+    }
+
+    .job-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .company-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #4B5563;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+        color: #9CA3AF;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .icon-btn:hover {
+        color: #111827;
+    }
+
+    .icon-btn.heart.saved {
+        color: #EF4444;
+    }
+
+    .icon-btn.delete:hover {
+        color: #EF4444;
+    }
+
+    .icon-btn.edit:hover {
+        color: #2563EB;
+    }
+
+    .job-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #6B7280;
+        font-size: 0.875rem;
+        margin-bottom: 16px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .job-description {
+        font-size: 0.95rem;
+        color: #4B5563;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .skills-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    .skill-tag {
+        background-color: #F3F4F6;
+        color: #4B5563;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 20px;
+        border-top: 1px solid #F3F4F6;
+    }
+
+    .posted-time {
+        font-size: 0.875rem;
+        color: #9CA3AF;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        width: 100%;
+        grid-column: 1 / -1;
+        font-size: 1.5rem;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+`;
+
+const JobList = React.memo(() => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -23,6 +275,7 @@ const JobList = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('all'); 
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -88,7 +341,13 @@ const JobList = () => {
 
     const handleEdit = (e, jobId) => {
         e.stopPropagation();
-        navigate(`/jobs/${jobId}/edit`);
+        const job = jobs.find(j => j._id === jobId);
+        navigate(`/jobs/${jobId}/edit`, { 
+            state: { 
+                background: location,
+                jobData: job,
+            } 
+        });
     };
 
     const handleCardClick = (job) => {
@@ -106,24 +365,26 @@ const JobList = () => {
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
 
-    const filteredJobs = jobs.filter(job => {
-        const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             job.company.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const role = user?.role?.toLowerCase();
-        if (role === 'recruiter') {
-            const postedById = String(job.postedBy?._id || job.postedBy?.id || job.postedBy);
-            const isMyJob = postedById === String(user?.id || user?._id);
+    const filteredJobs = useMemo(() => {
+        return jobs.filter(job => {
+            const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                 job.company.toLowerCase().includes(searchTerm.toLowerCase());
             
-            if (activeTab === 'my') {
-                return matchesSearch && isMyJob;
-            } else {
-                return matchesSearch && !isMyJob;
+            const role = user?.role?.toLowerCase();
+            if (role === 'recruiter') {
+                const postedById = String(job.postedBy?._id || job.postedBy?.id || job.postedBy);
+                const isMyJob = postedById === String(user?.id || user?._id);
+                
+                if (activeTab === 'my') {
+                    return matchesSearch && isMyJob;
+                } else {
+                    return matchesSearch && !isMyJob;
+                }
             }
-        }
 
-        return matchesSearch;
-    });
+            return matchesSearch;
+        });
+    }, [jobs, searchTerm, user, activeTab]);
 
     if (loading) return <Loader fullPage message="Finding the best jobs for you..." />;
 
@@ -140,257 +401,7 @@ const JobList = () => {
 
     return (
         <div className="job-list-container">
-            <style>{`
-                .job-list-container {
-                    padding: 24px 40px;
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    font-family: 'Inter', sans-serif;
-                }
-
-                .page-header {
-                    margin-bottom: 32px;
-                }
-
-                .header-top {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 24px;
-                }
-
-                .title-icon{
-                    color: #2563EB;
-                }
-
-                .page-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    font-size: 1.875rem;
-                    font-weight: 700;
-                    color: #111827;
-                }
-
-                .search-bar {
-                    position: relative;
-                    width: 100%;
-                    max-width: 400px;
-                }
-
-                .search-bar input {
-                    width: 100%;
-                    padding: 12px 16px 12px 44px;
-                    border: 1px solid #E5E7EB;
-                    border-radius: 12px;
-                    font-size: 0.95rem;
-                    outline: none;
-                    transition: border-color 0.2s, box-shadow 0.2s;
-                    background-color: #FFFFFF;
-                }
-
-                .search-bar input:focus {
-                    border-color: #2563EB;
-                    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-                }
-
-                .search-icon {
-                    position: absolute;
-                    left: 16px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #9CA3AF;
-                    font-size: 1.1rem;
-                }
-
-                .tabs {
-                    display: flex;
-                    gap: 32px;
-                    border-bottom: 1px solid #E5E7EB;
-                    margin-bottom: 32px;
-                }
-
-                .tab {
-                    padding: 12px 4px;
-                    font-size: 1rem;
-                    font-weight: 500;
-                    color: #6B7280;
-                    cursor: pointer;
-                    position: relative;
-                    transition: color 0.2s;
-                }
-
-                .tab:hover {
-                    color: #111827;
-                }
-
-                .tab.active {
-                    color: #2563EB;
-                }
-
-                .tab.active::after {
-                    content: '';
-                    position: absolute;
-                    bottom: -1px;
-                    left: 0;
-                    right: 0;
-                    height: 2px;
-                    background-color: #2563EB;
-                }
-
-                .jobs-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-                    gap: 24px;
-                }
-
-                .job-card {
-                    background: #FFFFFF;
-                    border: 1px solid #F3F4F6;
-                    border-radius: 16px;
-                    padding: 24px;
-                    cursor: pointer;
-                    transition: transform 0.2s, box-shadow 0.2s;
-                    display: flex;
-                    flex-direction: column;
-                    position: relative;
-                }
-
-                .job-card:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08);
-                }
-
-                .card-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    margin-bottom: 16px;
-                }
-
-                .title-area {
-                    flex: 1;
-                }
-
-                .job-title {
-                    font-size: 1.25rem;
-                    font-weight: 700;
-                    color: #111827;
-                    margin-bottom: 4px;
-                }
-
-                .company-name {
-                    font-size: 0.875rem;
-                    font-weight: 600;
-                    color: #4B5563;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .action-icons {
-                    display: flex;
-                    gap: 12px;
-                }
-
-                .icon-btn {
-                    background: none;
-                    border: none;
-                    padding: 4px;
-                    cursor: pointer;
-                    color: #9CA3AF;
-                    transition: color 0.2s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.25rem;
-                }
-
-                .icon-btn:hover {
-                    color: #111827;
-                }
-
-                .icon-btn.heart.saved {
-                    color: #EF4444;
-                }
-
-                .icon-btn.delete:hover {
-                    color: #EF4444;
-                }
-
-                .icon-btn.edit:hover {
-                    color: #2563EB;
-                }
-
-                .job-meta {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                    color: #6B7280;
-                    font-size: 0.875rem;
-                    margin-bottom: 16px;
-                }
-
-                .meta-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                }
-
-                .job-description {
-                    font-size: 0.95rem;
-                    color: #4B5563;
-                    line-height: 1.6;
-                    margin-bottom: 20px;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 3;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-
-                .skills-tags {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 8px;
-                    margin-bottom: 24px;
-                    flex-grow: 1;
-                }
-
-                .skill-tag {
-                    background-color: #F3F4F6;
-                    color: #4B5563;
-                    padding: 6px 14px;
-                    border-radius: 8px;
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                }
-
-                .card-footer {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding-top: 20px;
-                    border-top: 1px solid #F3F4F6;
-                }
-
-                .posted-time {
-                    font-size: 0.875rem;
-                    color: #9CA3AF;
-                    font-weight: 500;
-                }
-
-                .empty-state {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 400px;
-                    width: 100%;
-                    grid-column: 1 / -1;
-                    font-size: 1.5rem;
-                    color: #111827;
-                    margin-bottom: 8px;
-                }
-            `}</style>
+            <style>{jobListStyles}</style>
 
             <header className="page-header">
                 <div className="header-top">
@@ -517,6 +528,6 @@ const JobList = () => {
             </main>
         </div>
     );
-};
+});
 
 export default JobList;

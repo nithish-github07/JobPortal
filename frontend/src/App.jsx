@@ -75,6 +75,9 @@ const AppRoutes = () => {
       {background && (
         <Routes>
           <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/jobs/:id/edit" element={
+            <ProtectedRoute role="recruiter"><EditJob /></ProtectedRoute>
+          } />
         </Routes>
       )}
     </>

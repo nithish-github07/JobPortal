@@ -64,7 +64,7 @@ const Login = () => {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         margin-left: -10px;
     }
 

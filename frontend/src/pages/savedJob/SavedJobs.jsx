@@ -215,7 +215,6 @@ const SavedJobs = () => {
                 }
 
                 .icon-btn:hover {
-                    background-color: #FEE2E2;
                     color: #EF4444;
                 }
 
